@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class InputManager : MonoBehaviour
 {
     [Header("Basic movement handling", order = 1)]
@@ -12,17 +13,24 @@ public class InputManager : MonoBehaviour
     [SerializeField, Range(0f, 100f)] float MaxSpeed = 10f;
     [SerializeField, Range(0f, 100f)] float MaxAcceleration = 10f;
     [SerializeField] private bool CollisionTest;
-    [SerializeField] Rect AllowedArea = new Rect(-5f, -5f, 10f, 10f);
-    [SerializeField, Range(0f, 1f)] float Bounciness = 1f;
 
+    //variables that will not be displayed, but can be returned by method
     [SerializeField] private Vector3 velocity = new Vector2(0f, 0f);
+    [SerializeField] private Vector3 desiredVelocity = new Vector3(0f, 0f, 0f);
+    Rigidbody2D rb;
 
-    void Start()
+    [Header("Basic movement handling", order = 2)]
+    [Space(10)]
+    [SerializeField] private bool KeepSceneViewActive2;//testing spacing, lol
+
+    private void Awake()
     {
         if (this.KeepSceneViewActive && Application.isEditor)
         {
             UnityEditor.SceneView.FocusWindowIfItsOpen(typeof(UnityEditor.SceneView));
         }
+
+        rb = this.GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
@@ -42,12 +50,25 @@ public class InputManager : MonoBehaviour
             PlayerInput = Vector2.ClampMagnitude(PlayerInput, 1f);
         }
 
-        // movement without limits
-        Vector3 desiredVelocity = new Vector2(PlayerInput.x, PlayerInput.y) * MaxSpeed;
+        //we get a smoother output if the desired speed is calculated on every displayed frame
+        desiredVelocity = new Vector2(PlayerInput.x, PlayerInput.y) * MaxSpeed;
+
+        if (Input.GetKeyDown("k"))
+        {
+            rb.AddForce(Vector2.up * Mathf.Sqrt(2 * Physics2D.gravity.magnitude * 2f), ForceMode2D.Impulse);
+            Debug.Log("jumped");
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        //This math works better in FixedUpdate due to syncing with the physics simulation
+
+        velocity = rb.velocity;
         float maxSpeedChange = MaxAcceleration * Time.deltaTime;
 
         //velocity added based on input
-        
+
         //<<<<<<------X------>>>>>>
 
         if (velocity.x < desiredVelocity.x)
@@ -61,6 +82,7 @@ public class InputManager : MonoBehaviour
 
         //<<<<<<------Y------>>>>>>
 
+        /*
         if (velocity.y < desiredVelocity.y)
         {
             velocity.y = Mathf.Min(velocity.y + maxSpeedChange, desiredVelocity.y);
@@ -69,44 +91,7 @@ public class InputManager : MonoBehaviour
         {
             velocity.y = Mathf.Max(velocity.y - maxSpeedChange, desiredVelocity.y);
         }
-
-        //displacement must be a vector3 to be addable to the transform without creating a new vector.
-        Vector3 displacement = velocity * Time.deltaTime;
-
-        //this creates our final vector, but we will apply it after collision checks
-        Vector2 NewPosition = transform.localPosition + displacement;
-
-        //Testing movement on collision, by creating a fake collider.
-
-        if (CollisionTest)
-        {
-            if (NewPosition.x < AllowedArea.xMin)
-            {
-                NewPosition.x = AllowedArea.xMin;
-                velocity.x = -velocity.x * Bounciness;
-            }
-            else if (NewPosition.x > AllowedArea.xMax)
-            {
-                NewPosition.x = AllowedArea.xMax;
-                velocity.x = -velocity.x * Bounciness;
-            }
-            if (NewPosition.y < AllowedArea.yMin)
-            {
-                NewPosition.y = AllowedArea.yMin;
-                velocity.y = -velocity.y * Bounciness;
-            }
-            else if (NewPosition.y > AllowedArea.yMax)
-            {
-                NewPosition.y = AllowedArea.yMax;
-                velocity.y = -velocity.y * Bounciness;
-            }
-
-            Debug.DrawLine(new Vector3(AllowedArea.x, AllowedArea.y), new Vector3(AllowedArea.x + AllowedArea.width, AllowedArea.y), Color.green);
-            Debug.DrawLine(new Vector3(AllowedArea.x, AllowedArea.y), new Vector3(AllowedArea.x, AllowedArea.y + AllowedArea.height), Color.red);
-            Debug.DrawLine(new Vector3(AllowedArea.x + AllowedArea.width, AllowedArea.y + AllowedArea.height), new Vector3(AllowedArea.x + AllowedArea.width, AllowedArea.y), Color.green);
-            Debug.DrawLine(new Vector3(AllowedArea.x + AllowedArea.width, AllowedArea.y + AllowedArea.height), new Vector3(AllowedArea.x, AllowedArea.y + AllowedArea.height), Color.red);
-        }
-
-        transform.localPosition = NewPosition;
+        */
+        rb.velocity = velocity;
     }
 }
