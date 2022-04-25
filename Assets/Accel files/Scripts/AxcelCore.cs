@@ -5,31 +5,13 @@ using UnityEditor;
 
 public class ReadOnlyAttribute : PropertyAttribute{}
 
-[CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
-public class ReadOnlyDrawer : PropertyDrawer
-{
-    public override float GetPropertyHeight(SerializedProperty property,
-                                            GUIContent label)
-    {
-        return EditorGUI.GetPropertyHeight(property, label, true);
-    }
-
-    public override void OnGUI(Rect position,
-                               SerializedProperty property,
-                               GUIContent label)
-    {
-        GUI.enabled = false;
-        EditorGUI.PropertyField(position, property, label, true);
-        GUI.enabled = true;
-    }
-}
-
 namespace AccelEngine
 {
     public class AxcelCore : MonoBehaviour
     {
         [SerializeField] ////// PLEASE DESERIALIZE THIS WHEN POSSIBLE
         public readonly Vector3[] CheckPositions = new Vector3[8];
+        public Vector3 LastVelocity = Vector3.zero;
         
         private CapsuleCollider2D col;
         private Rigidbody2D rb;
@@ -90,6 +72,7 @@ namespace AccelEngine
             }
 
             rb.velocity = _velocity;
+            LastVelocity = _velocity;
         }
 
         // Update is maintained for future animation possibility
@@ -98,5 +81,9 @@ namespace AccelEngine
 
         }
 
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            Debug.Log("hit something " + collision.collider.name); //othercollider returns this items name oddly
+        }
     }
 }
