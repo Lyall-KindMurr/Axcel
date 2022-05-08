@@ -7,26 +7,34 @@ namespace AccelEngine
     public class Walking : MonoBehaviour, IMovementModifier
     {
         [SerializeField]
-        private AxcelCore axcelCore = null;
+        private AccelCore axcelCore = null;
 
+        public bool Absolute { get; private set; }
+        public bool Priority { get; private set; }
         public Vector3 Value { get; private set; }
-        public Vector3 tester;
 
         [Header("Settings")]
         private int speed = 5;
 
+        //////////////////////////////////////
+        // DO NOT REMOVE THE ONENABLE AND ONDISABLE
+        //////////////////////////////////////
         private void OnEnable()
         {
-            axcelCore = GetComponent<AxcelCore>();
+            Priority = false;
+            Absolute = false;
+            axcelCore = GetComponent<AccelCore>();
             axcelCore.AddModule(this);
         }
         private void OnDisable()
         {
-            axcelCore = GetComponent<AxcelCore>();
+            axcelCore = GetComponent<AccelCore>();
             axcelCore.RemoveModule(this);
         }
 
-        void Update()
+
+        //move this to jumping, dunce
+        private void FixedUpdate()
         {
             /*
             Vector2 PlayerInput;
@@ -44,13 +52,13 @@ namespace AccelEngine
             */
             if (Input.GetKeyDown("k"))
             {
-                Value = Vector2.up * Mathf.Sqrt(2 * Physics2D.gravity.magnitude * 2f);
+                float height = 2.0f;
+                Value = Vector2.up * Mathf.Sqrt(Physics2D.gravity.magnitude * height);
             }
-        }
-
-        private void FixedUpdate()
-        {
-            
+            else
+            {
+                Value = Vector2.zero;
+            }
         }
     }
 }
