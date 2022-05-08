@@ -7,10 +7,19 @@ Originally created in Unity version 2021.1.17f1, and compatible with all version
 ### **Usage**
 
 Slap the AccelEngine on a gameobject, then either add a custom input manager, or the one provided in the example.
-The engine script will automatically add a rigidbody2D component and a capsule collider if it cannot find one, so make sure this is placed on the root of your character.
-Go in the modules folder, and drag and drop any modules you need, play with the sliders until you find the settings that you need.
-There is no limit to how many modules you can add, and there is a blank template to create your own additional modules. (This will be used later in development for updates, so stay tuned)
 
+The engine script will automatically add a rigidbody2D component and a capsule collider if it cannot find one, so make sure this is placed on the root of your character.
+
+Go in the ***modules*** folder, and drag and drop any modules you need, play with the sliders until you find the settings that you need.
+Included in the base package are:
+- walking
+- advanced jumping
+- shoving
+
+#### **Development and future**
+
+There is no limit to how many modules you can add, and there is a blank template to create your own additional modules. (This will be used later in development for updates, so stay tuned)
+For easier development of other modules, the engine stores 8 points that are assigned dynamically depending on the base collider, which allow for defining easier raycasts. These arenumbered 0-7, 0 being positioned above the character, and the others going clockwise in a 45°, and being slightly offset from corners to avoid weird collisions.
 
 
 
