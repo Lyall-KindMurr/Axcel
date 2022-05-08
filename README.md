@@ -1,8 +1,10 @@
-C:\Users\Lyall\Documents\GitHub\Accel\Assets\Accel files\Scripts\modules# Axcel
+# Axcel
 
 A modular set of movement scripts to allow easy prototyping and further development for 2D platformers made on the Unity platform.
 
-##### Usage
+Originally created in Unity version 2021.1.17f1, and compatible with all versions using the same input system.
+
+### **Usage**
 
 Slap the AccelEngine on a gameobject, then either add a custom input manager, or the one provided in the example.
 The engine script will automatically add a rigidbody2D component and a capsule collider if it cannot find one, so make sure this is placed on the root of your character.
@@ -13,7 +15,7 @@ There is no limit to how many modules you can add, and there is a blank template
 
 
 
-##### Copyrighting
+### **Copyrighting**
 
 Copyright 2022 Lyall Kindmurr
 
