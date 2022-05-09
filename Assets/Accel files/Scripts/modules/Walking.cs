@@ -7,14 +7,18 @@ namespace AccelEngine
     public class Walking : MonoBehaviour, IMovementModifier
     {
         [SerializeField]
-        private AccelCore axcelCore = null;
+        private AccelCore accelCore = null;
 
         public bool Absolute { get; private set; }
         public bool Priority { get; private set; }
         public Vector3 Value { get; private set; }
 
         [Header("Settings")]
-        private int speed = 5;
+        [SerializeField] private int speed = 5;
+        [SerializeField] private Vector3 desiredVelocity = new Vector3(0f, 0f, 0f);
+        [SerializeField] private float maxAcceleration = 1;
+        private Rigidbody2D velocity;
+        private Vector3 _velocity = new Vector2(0f, 0f);
 
         //////////////////////////////////////
         // DO NOT REMOVE THE ONENABLE AND ONDISABLE
@@ -23,42 +27,40 @@ namespace AccelEngine
         {
             Priority = false;
             Absolute = false;
-            axcelCore = GetComponent<AccelCore>();
-            axcelCore.AddModule(this);
+            accelCore = GetComponent<AccelCore>();
+            accelCore.AddModule(this);
+            velocity = GetComponent<Rigidbody2D>();
         }
         private void OnDisable()
         {
-            axcelCore = GetComponent<AccelCore>();
-            axcelCore.RemoveModule(this);
+            accelCore = GetComponent<AccelCore>();
+            accelCore.RemoveModule(this);
         }
 
+        private void Update()
+        {
+            desiredVelocity = new Vector2(accelCore.Xinput1 * speed, 0.0f);
+        }
 
-        //move this to jumping, dunce
         private void FixedUpdate()
         {
-            /*
-            Vector2 PlayerInput;
-            PlayerInput.x = Input.GetAxis("Horizontal");
-            PlayerInput.y = Input.GetAxis("Vertical");
+            _velocity = velocity.velocity;
+            float maxSpeedChange = maxAcceleration * Time.fixedDeltaTime;
+            Debug.Log(_velocity);
+            Debug.Log(maxSpeedChange);
+            //velocity added based on input
 
-            //we get a smoother output if the desired speed is calculated on every displayed frame
-            desiredVelocity = new Vector2(PlayerInput.x, PlayerInput.y) * MaxSpeed;
+            //<<<<<<------X------>>>>>>
 
-            if (Input.GetKeyDown("k"))
+            if (_velocity.x < desiredVelocity.x)
             {
-                rb.AddForce(Vector2.up * Mathf.Sqrt(2 * Physics2D.gravity.magnitude * 2f), ForceMode2D.Impulse);
-                Debug.Log("jumped");
+                _velocity.x = Mathf.Min(_velocity.x + maxSpeedChange, desiredVelocity.x);
             }
-            */
-            if (Input.GetKeyDown("k"))
+            else if (_velocity.x > desiredVelocity.x)
             {
-                float height = 2.0f;
-                Value = Vector2.up * Mathf.Sqrt(Physics2D.gravity.magnitude * height);
+                _velocity.x = Mathf.Max(_velocity.x - maxSpeedChange, desiredVelocity.x);
             }
-            else
-            {
-                Value = Vector2.zero;
-            }
+            velocity.velocity = _velocity;
         }
     }
 }

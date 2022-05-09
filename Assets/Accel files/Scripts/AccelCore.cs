@@ -40,9 +40,9 @@ namespace AccelEngine
         [ReadOnly] public bool ActionKey2;
         [ReadOnly] public bool ActionKey3;
         [ReadOnly] [Range(-1.0f, 1.0f)] public float Xinput1;
-        [ReadOnly] [Range(0.0f, 1.0f)] public float Yinput1;
-        [ReadOnly] [Range(0.0f, 1.0f)] public float Xinput2;
-        [ReadOnly] [Range(0.0f, 1.0f)] public float Yinput2;
+        [ReadOnly] [Range(-1.0f, 1.0f)] public float Yinput1;
+        [ReadOnly] [Range(-1.0f, 1.0f)] public float Xinput2;
+        [ReadOnly] [Range(-1.0f, 1.0f)] public float Yinput2;
 
         [Header("Connected components", order = 1)]
         [ReadOnly] public AccelAnimationCore accAnim;
@@ -59,7 +59,10 @@ namespace AccelEngine
             // make sure there is an input manager, and that its active
             inputManager = this.GetComponent<IInputManager>();
             Behaviour _inputManager = (Behaviour)this.GetComponent<IInputManager>();
-            _inputManager.enabled = true;
+            if (_inputManager.enabled != true)
+            {
+                _inputManager.enabled = true;
+            }
             if (inputManager == null)
             {
                 Debug.Log("Error initiating Engine, no input manager found, adding default one");
@@ -83,11 +86,11 @@ namespace AccelEngine
             //we place the transforms for boundary checks
             // these should go in a clockwise pattern, with 0 being the top
             {                
-                CheckPositions[0] = new Vector3(0f, col.size.y / 2 + col.offset.y -0.05f, 0f);
+                CheckPositions[0] = new Vector3(0f, col.size.y / 2 + col.offset.y, 0f);
                 CheckPositions[1] = new Vector3(col.size.x / 2 + col.offset.x, col.size.y / 2 + col.offset.y - 0.05f, 0f);
                 CheckPositions[2] = new Vector3(col.size.x / 2 + col.offset.x, 0f, 0f);
                 CheckPositions[3] = new Vector3(col.size.x / 2 + col.offset.x, -col.size.y / 2 + col.offset.y + 0.05f, 0f);
-                CheckPositions[4] = new Vector3(0f, -col.size.y / 2 + col.offset.y + 0.05f, 0f);
+                CheckPositions[4] = new Vector3(0f, -col.size.y / 2 + col.offset.y, 0f);
                 CheckPositions[5] = new Vector3(-col.size.x / 2 + col.offset.x, -col.size.y / 2 + col.offset.y + 0.05f, 0f);
                 CheckPositions[6] = new Vector3(-col.size.x / 2 + col.offset.x, 0f, 0f);
                 CheckPositions[7] = new Vector3(-col.size.x / 2 + col.offset.x, col.size.y / 2 + col.offset.y - 0.05f, 0f);
@@ -98,7 +101,7 @@ namespace AccelEngine
 
         private void Move()
         {
-            Vector3 _velocity = LastVelocity;
+            Vector3 _velocity = rb.velocity;
 
             foreach(IMovementModifier module in modules)
             {
@@ -113,10 +116,7 @@ namespace AccelEngine
                     rb.isKinematic = false;
                     _velocity += module.Value;
                 }
-                Debug.Log("modules absolution value:" + module.Absolute);
-                Debug.Log("velocity given:"+module.Value);
             }
-            LastVelocity = rb.velocity;
 
             if (_velocity != Vector3.zero)
             {
@@ -134,11 +134,6 @@ namespace AccelEngine
             Yinput1 = inputManager.Yinput1;
             Xinput2 = inputManager.Xinput2;
             Yinput2 = inputManager.Yinput2;
-        }
-
-        private void OnCollisionEnter2D(Collision2D collision)
-        {
-            Debug.Log("hit something " + collision.collider.name); //othercollider returns this items name oddly
         }
     }
 }

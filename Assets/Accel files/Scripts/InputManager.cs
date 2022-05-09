@@ -94,4 +94,9 @@ public class InputManager : MonoBehaviour
         */
         rb.velocity = velocity;
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Debug.Log("hit something " + collision.collider.name); //othercollider returns this items name oddly
+    }
 }
