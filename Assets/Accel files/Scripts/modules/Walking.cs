@@ -46,7 +46,7 @@ namespace AccelEngine
         {
             _velocity = velocity.velocity;
             float maxSpeedChange = maxAcceleration * Time.fixedDeltaTime;
-            Debug.Log(_velocity);
+            //Debug.Log(_velocity);
             Debug.Log(maxSpeedChange);
             //velocity added based on input
 

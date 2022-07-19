@@ -31,13 +31,14 @@ public class AdvancedJumping : MonoBehaviour, IMovementModifier
         accelCore = GetComponent<AccelCore>();
         accelCore.RemoveModule(this);
     }
+
     private void FixedUpdate()
     {
         if (accelCore.ActionKey1 && !jumpedThisPress)
         {
             for (int i = 0; i <= 2; i++)
             {
-                RaycastHit2D hit = Physics2D.Raycast(transform.position - new Vector3(-0.3f + 0.3f*i,0f,0f), Vector2.down, 0.1f);
+                RaycastHit2D hit = Physics2D.Raycast(transform.position - new Vector3(-0.5f + 0.3f*i,0f,0f), Vector2.down, 0.1f);
                 if (hit.collider != null && hit.transform.tag != "NotJumpable")
                 {
                     Value = Vector2.up * Mathf.Sqrt(2f * Physics2D.gravity.magnitude * height);
