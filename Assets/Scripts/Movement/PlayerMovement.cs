@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
     private Rigidbody2D rb;
     private CapsuleCollider2D col;
+    private bool grounded = false;
 
 
     [Header("Jumping Settings")]
@@ -14,14 +15,30 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("distance between jumping rays, to accomodate more X-wide characters")]
     public float RayOffset = 0.3f;
 
-    [Header("Please show up Walking")]
-    public int speeds;
+    [Header("Walking")]
+    [SerializeField] private int speed = 10;
+    [SerializeField] [Range(0f,5f)] private float turnPower = 2f;
+    [SerializeField] private Vector2 desiredVelocity = new Vector3(0f, 0f, 0f);
+    [SerializeField] private float maxAcceleration = 10;
+    private float maxSpeedChange;
+    [SerializeField] private float maxAirAcceleration = 50;
+    private float maxAirSpeedChange;
+    private Vector3 _velocity = new Vector2(0f, 0f);
 
-    private void Start()
+    private void Update() => LiveUpdate();
+
+    private void Awake()
     {
         rb = this.GetComponent<Rigidbody2D>();
-
         col = this.GetComponent<CapsuleCollider2D>();
+
+        maxSpeedChange = maxAcceleration * Time.fixedDeltaTime;
+        maxAirSpeedChange = maxAirAcceleration * Time.fixedDeltaTime;
+    }
+
+    private void LiveUpdate()
+    {
+        desiredVelocity = new Vector2(Input.GetAxis("Horizontal") * speed, 0.0f);
     }
 
     private void FixedUpdate()
@@ -29,7 +46,7 @@ public class PlayerMovement : MonoBehaviour
         ///////////
         /// Jumping
         ///////////
-        if (Input.GetButton("Fire1") && !jumpedThisPress)
+        if (Input.GetButton("Jump") && !jumpedThisPress)
         {
             for (int i = 0; i <= 2; i++)
             {
@@ -39,7 +56,7 @@ public class PlayerMovement : MonoBehaviour
                 //this doesn't work on default objects because their center is in their core. we need collider
                 //to offset the math to the feet/base of object
                 RaycastHit2D hit = Physics2D.Raycast(transform.position - new Vector3(0.3f * (i - 1), 0f, 0f), Vector2.down, 0.1f);
-                Debug.DrawRay(transform.position - new Vector3(-0.5f + 0.3f * i, 0f, 0f), Vector2.down, Color.red);
+                Debug.DrawRay(transform.position - new Vector3(0.3f * (i - 1), 0f, 0f), Vector2.down, Color.cyan);
                 Debug.Log(hit.collider);
                 if (hit.collider != null && hit.transform.tag != "NotJumpable")
                 {
@@ -52,7 +69,7 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
         }
-        else if (!Input.GetButton("Fire1"))
+        else if (!Input.GetButton("Jump"))
         {
             jumpedThisPress = false;
         }
@@ -60,5 +77,57 @@ public class PlayerMovement : MonoBehaviour
         ///////////
         /// Walking
         ///////////
+
+        for (int i = 0; i <= 2; i++)
+        {
+            RaycastHit2D hit = Physics2D.Raycast(transform.position - new Vector3(0.3f * (i - 1), 0f, 0f), Vector2.down, 0.1f);
+            if (hit.collider != null)
+            {
+                grounded = true;
+            }
+            else grounded = false;
+        }
+
+        
+        if (rb.velocity.x < desiredVelocity.x)
+        {
+            if (grounded)
+            {
+                _velocity.x = Mathf.Min(_velocity.x + maxSpeedChange / 2, desiredVelocity.x);
+
+                if (Mathf.Clamp(rb.velocity.x,-1f,1f) * Mathf.Clamp(desiredVelocity.x, -1f, 1f) <  0) //we are trying to turn around
+                {
+                    _velocity.x = Mathf.Min(_velocity.x + maxSpeedChange * turnPower, desiredVelocity.x);
+                }
+            }
+            else
+            {
+                _velocity.x = Mathf.Min(_velocity.x + maxAirSpeedChange, desiredVelocity.x);
+            }
+        }
+        else if (rb.velocity.x > desiredVelocity.x)
+        {
+            if (grounded)
+            {
+                _velocity.x = Mathf.Max(_velocity.x - maxSpeedChange / 2, desiredVelocity.x);
+
+                if (Mathf.Clamp(rb.velocity.x, -1f, 1f) * Mathf.Clamp(desiredVelocity.x, -1f, 1f) < 0) //we are trying to turn around
+                {
+                    _velocity.x = Mathf.Max(_velocity.x - maxSpeedChange * turnPower, desiredVelocity.x);
+                }
+            }
+            else
+            {
+                _velocity.x = Mathf.Max(_velocity.x - maxAirSpeedChange, desiredVelocity.x);
+            }
+        }
+        
+        rb.velocity = new Vector2(_velocity.x, rb.velocity.y);
+
+        ///////////
+        /// Walking
+        ///////////
+        
+
     }
 }
