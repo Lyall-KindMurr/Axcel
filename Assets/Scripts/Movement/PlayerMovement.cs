@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//ContactFilter2D CAN BE USED TO CHANGE PLAYER DASH COLLISIONS
+
 public class PlayerMovement : MonoBehaviour
 {
     private Rigidbody2D rb;
@@ -55,18 +57,21 @@ public class PlayerMovement : MonoBehaviour
 
                 //this doesn't work on default objects because their center is in their core. we need collider
                 //to offset the math to the feet/base of object
-                RaycastHit2D hit = Physics2D.Raycast(transform.position - new Vector3(0.3f * (i - 1), 0f, 0f), Vector2.down, 0.1f);
+                RaycastHit2D[] hit = Physics2D.RaycastAll(transform.position - new Vector3(0.3f * (i - 1), 0f, 0f), Vector2.down, 0.1f);
                 Debug.DrawRay(transform.position - new Vector3(0.3f * (i - 1), 0f, 0f), Vector2.down, Color.cyan);
-                Debug.Log(hit.collider);
-                if (hit.collider != null && hit.transform.tag != "NotJumpable")
-                {
-                    Debug.Log(hit.collider);
 
-                    Vector2 newVelocity = new Vector2(rb.velocity.x, Mathf.Sqrt(2f * Physics2D.gravity.magnitude * height));
-                    rb.velocity = newVelocity;
-                    jumpedThisPress = true;
-                    break;
-                }
+                for (int j = 0; j < hit.Length; j++)
+                {
+                    if (hit[j].collider != null && hit[j].transform.tag != "NotJumpable")
+                    {
+                        Debug.Log("Jumped from" + hit[j].collider);
+
+                        Vector2 newVelocity = new Vector2(rb.velocity.x, Mathf.Sqrt(2f * Physics2D.gravity.magnitude * height));
+                        rb.velocity = newVelocity;
+                        jumpedThisPress = true;
+                        break;
+                    }
+                }               
             }
         }
         else if (!Input.GetButton("Jump"))
