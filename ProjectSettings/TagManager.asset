@@ -13,11 +13,11 @@ TagManager:
   - Water
   - UI
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Player Hitbox
+  - Player Hurtbox
+  - Enemy Physics
+  - Enemy Hitbox
+  - enemy Hurtbox
   - 
   - 
   - 
