@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private CapsuleCollider2D col;
     private bool grounded = false;
+    private Animator anim;
 
 
     [Header("Jumping Settings")]
@@ -36,10 +37,14 @@ public class PlayerMovement : MonoBehaviour
 
         maxSpeedChange = maxAcceleration * Time.fixedDeltaTime;
         maxAirSpeedChange = maxAirAcceleration * Time.fixedDeltaTime;
+
+        anim = this.transform.GetChild(0).GetComponent<Animator>();
     }
 
     private void LiveUpdate()
     {
+        anim.SetFloat("XVelocity", rb.velocity.x);
+        anim.SetFloat("YVelocity", rb.velocity.y);
         desiredVelocity = new Vector2(Input.GetAxis("Horizontal") * speed, 0.0f);
     }
 
@@ -65,6 +70,8 @@ public class PlayerMovement : MonoBehaviour
                     if (hit[j].collider != null && hit[j].transform.tag != "NotJumpable")
                     {
                         Debug.Log("Jumped from" + hit[j].collider);
+
+                        anim.Play("Jump");
 
                         Vector2 newVelocity = new Vector2(rb.velocity.x, Mathf.Sqrt(2f * Physics2D.gravity.magnitude * height));
                         rb.velocity = newVelocity;
