@@ -6,6 +6,8 @@ public class EnemyMovement : MonoBehaviour
 {
     private Rigidbody2D rb;
     private BoxCollider2D col;
+    private bool isAttacking;
+
 
     [Header("Walking")]
     [SerializeField] private int speed = 4;
@@ -19,7 +21,8 @@ public class EnemyMovement : MonoBehaviour
     [Header("AI")]
     public bool goingLeft;
     public Coroutine walk;
-    bool isWalking;
+    bool isWalking = true;
+    public GameObject hitbox;
 
     private void Awake()
     {
@@ -61,6 +64,23 @@ public class EnemyMovement : MonoBehaviour
 
         if (isWalking)
             Walk();
+
+        
+        hit = Physics2D.RaycastAll(transform.position, Vector2.left, 1.0f);
+        Debug.DrawRay(transform.position, Vector2.left);
+        for (int i = 0; i < hit.Length; i++)
+        {
+            if (hit[i].collider.tag == "Player" && !isAttacking)
+            {
+                isAttacking = true;
+                isWalking = false;
+                rb.velocity = Vector2.zero;
+                rb.bodyType = RigidbodyType2D.Static;
+                StartCoroutine("WaitThenAttack");
+                break;
+            }
+        }
+        
     }
 
     IEnumerator CalculateDirection()
@@ -92,18 +112,18 @@ public class EnemyMovement : MonoBehaviour
         rb.velocity = new Vector2(_velocity.x, rb.velocity.y);
     }
 
-    private void Update()
+    IEnumerator WaitThenAttack()
     {
-        if(Input.GetKeyDown(KeyCode.C))
-        {
-            if (isWalking)
-            {
-                isWalking = false;
-                rb.velocity = new Vector2(0.0f, rb.velocity.y);
-            }
-            else
-                isWalking = true;
-        }
+        yield return new WaitForSeconds(1);
+        hitbox.SetActive(true);
+        yield return null;
+        yield return null;
+        yield return null;
+        hitbox.SetActive(false);
+        yield return new WaitForSeconds(0.5f);
+        isAttacking = false;
+        isWalking = true;
+        rb.bodyType = RigidbodyType2D.Dynamic;
     }
 
     void TurnAround()
