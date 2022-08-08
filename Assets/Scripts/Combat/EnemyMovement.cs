@@ -12,20 +12,20 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] private Vector2 desiredVelocity = new Vector2(0f, 0f);
     [SerializeField] private float maxAcceleration = 10;
     private float maxSpeedChange;
-    [SerializeField] private float maxAirAcceleration = 50;
-    private float maxAirSpeedChange;
     private Vector3 _velocity = new Vector2(0f, 0f);
 
     public float _side;
 
     [Header("AI")]
     public bool goingLeft;
-
+    public Coroutine walk;
+    bool isWalking;
 
     private void Awake()
     {
         rb = this.GetComponent<Rigidbody2D>();
         col = this.GetComponent<BoxCollider2D>();
+        walk = StartCoroutine(CalculateDirection());
 
         maxSpeedChange = maxAcceleration * Time.fixedDeltaTime;
     }
@@ -37,19 +37,6 @@ public class EnemyMovement : MonoBehaviour
         //we check in front, and if there's no platform, turn around
         _side = goingLeft ? 1f : -1f;
 
-        RaycastHit2D[] hit = Physics2D.RaycastAll(transform.position - new Vector3(_side, 0f, 0f), Vector2.down, col.size.y / 2 + 0.1f);
-        Debug.DrawRay(transform.position - new Vector3(_side, -col.size.y / 2 + 0.1f, 0f), Vector2.down, Color.yellow);
-        if (hit.Length == 0 && goingLeft)
-        {
-            Debug.Log("Turning around");
-            TurnAround();
-        }
-        else if (hit.Length == 0 && !goingLeft)
-        {
-            Debug.Log("Turning around");
-            TurnAround();
-        }
-
         if (goingLeft)
         {
             desiredVelocity.x = -1.0f * speed;
@@ -59,17 +46,64 @@ public class EnemyMovement : MonoBehaviour
             desiredVelocity.x = 1.0f * speed;
         }
 
+        RaycastHit2D[] hit = Physics2D.RaycastAll(transform.position - new Vector3(_side, 0f, 0f), Vector2.down, col.size.y / 2 + 0.1f);
+        Debug.DrawRay(transform.position - new Vector3(_side, -col.size.y / 2 + 0.1f, 0f), Vector2.down, Color.yellow);
+        if (hit.Length == 0 && goingLeft)
+        {
+            desiredVelocity.x = 0f;
+            TurnAround();
+        }
+        else if (hit.Length == 0 && !goingLeft)
+        {
+            desiredVelocity.x = 0f;
+            TurnAround();
+        }
 
-        //copied from the player controller
-        if (rb.velocity.x < desiredVelocity.x)
+        if (isWalking)
+            Walk();
+    }
+
+    IEnumerator CalculateDirection()
+    {
+        while (true)
         {
-            _velocity.x = Mathf.Min(_velocity.x + maxSpeedChange, desiredVelocity.x);
+            if (rb.velocity.x < desiredVelocity.x)
+            {
+                if (Mathf.Clamp(rb.velocity.x, -1f, 1f) * Mathf.Clamp(desiredVelocity.x, -1f, 1f) < 0) //we are trying to turn around
+                {
+                    _velocity.x = Mathf.Min(_velocity.x + maxSpeedChange * 10, desiredVelocity.x);
+                }
+                _velocity.x = Mathf.Min(_velocity.x + maxSpeedChange, desiredVelocity.x);
+            }
+            else if (rb.velocity.x > desiredVelocity.x)
+            {
+                if (Mathf.Clamp(rb.velocity.x, -1f, 1f) * Mathf.Clamp(desiredVelocity.x, -1f, 1f) < 0) //we are trying to turn around
+                {
+                    _velocity.x = Mathf.Max(_velocity.x - maxSpeedChange * 10, desiredVelocity.x);
+                }
+                _velocity.x = Mathf.Max(_velocity.x - maxSpeedChange, desiredVelocity.x);
+            }
+            yield return null;
         }
-        else if (rb.velocity.x > desiredVelocity.x)
-        {
-            _velocity.x = Mathf.Max(_velocity.x - maxSpeedChange, desiredVelocity.x);
-        }
+    }
+
+    void Walk()
+    {
         rb.velocity = new Vector2(_velocity.x, rb.velocity.y);
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.C))
+        {
+            if (isWalking)
+            {
+                isWalking = false;
+                rb.velocity = new Vector2(0.0f, rb.velocity.y);
+            }
+            else
+                isWalking = true;
+        }
     }
 
     void TurnAround()

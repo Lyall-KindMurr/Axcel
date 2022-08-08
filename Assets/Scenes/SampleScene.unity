@@ -9207,7 +9207,6 @@ MonoBehaviour:
   speed: 4
   desiredVelocity: {x: 0, y: 0}
   maxAcceleration: 10
-  maxAirAcceleration: 50
   _side: 0
   goingLeft: 1
 --- !u!50 &1478063394
