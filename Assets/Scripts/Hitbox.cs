@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class Hitbox : MonoBehaviour
 {
-    bool isenemy;
-    int damage;
+    public int damage;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

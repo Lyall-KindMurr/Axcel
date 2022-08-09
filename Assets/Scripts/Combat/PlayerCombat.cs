@@ -8,6 +8,7 @@ public class PlayerCombat : MonoBehaviour
     public bool canAttack = true;
     public PlayerAnimator playerAnim;
 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -16,12 +17,9 @@ public class PlayerCombat : MonoBehaviour
         StartCoroutine("Attack");
     }
 
-    //Cooldown time between attacks (in seconds)
     public float cooldown = 0.5f;
     public bool cancelable = false;
-    //Max time before combo ends (in seconds)
     public float maxTime = 0.8f;
-    //Max number of attacks in combo
     public int maxCombo = 5;
     //Current combo
     int combo = 0;
@@ -31,10 +29,9 @@ public class PlayerCombat : MonoBehaviour
 
     IEnumerator Attack()
     {
-        //Constantly loops so you only have to call it once
         while (true)
         {
-            if (Input.GetButtonDown("Fire1"))
+            if (Input.GetButtonDown("Fire1") && canAttack) //&& has weapon in that slot
             {
                 combo++;
                 Debug.Log("Attack " + combo);
@@ -71,9 +68,9 @@ public class PlayerCombat : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
+        /*
         if (Input.GetButtonDown("Fire1") && canAttack) //&& has weapon in that slot
         {
             Attack();
@@ -82,6 +79,7 @@ public class PlayerCombat : MonoBehaviour
         {
             Attack();
         }
+        */
         // weapon pickup? button and on a collider tagged as player? or something maybe new tag called pickupable
     }
 

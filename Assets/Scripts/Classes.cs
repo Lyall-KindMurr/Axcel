@@ -36,6 +36,9 @@ public class IdleState : CharacterState
 {
     override public CharacterState HandleState(string key)
     {
+        if (key == "Attack")
+            return new AttackState();
+
         return this;
     }
 }

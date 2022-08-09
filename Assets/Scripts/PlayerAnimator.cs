@@ -20,10 +20,9 @@ public class PlayerAnimator : MonoBehaviour
     private float timeBetweenAttacks;
     //public float startAttack; // we need this to tell the difference of time between attacks?
 
-    // Start is called before the first frame update
     void Start()
     {
-        anim = this.GetComponent<Animator>();
+        anim = this.GetComponentInChildren<Animator>();
     }
 
     public void AttackAnim (int counter)

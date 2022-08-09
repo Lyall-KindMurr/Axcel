@@ -13,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
     private PlayerAnimator playerAnim;
 
 
+
     [Header("Jumping Settings")]
     [Range(0.0f, 10.0f)] public float height = 2;
     private bool jumpedThisPress;
@@ -49,7 +50,7 @@ public class PlayerMovement : MonoBehaviour
         anim.SetFloat("XVelocity", rb.velocity.x);
         anim.SetFloat("YVelocity", rb.velocity.y);
         desiredVelocity = new Vector2(Input.GetAxis("Horizontal") * speed, 0.0f);
-        playerAnim.Grounded = grounded;
+        playerAnim.Grounded = grounded;      
     }
 
     private void FixedUpdate()
@@ -139,9 +140,19 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = new Vector2(_velocity.x, rb.velocity.y);
 
         ///////////
-        /// Walking
+        /// turning around
         ///////////
-        
+
+        if (desiredVelocity.x > 1f)
+        {
+            //we're going right
+            this.transform.localScale = new Vector3(1f, 1f, 1f);
+        }
+        if (desiredVelocity.x < -1f)
+        {
+            //we're going left
+            this.transform.localScale = new Vector3(-1f, 1f, 1f);
+        }
 
     }
 }
