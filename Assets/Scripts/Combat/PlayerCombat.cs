@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerCombat : MonoBehaviour
 {
+    public int health;
     public PlayerMovement movementController;
     public bool canAttack = true;
     public PlayerAnimator playerAnim;
@@ -12,8 +13,9 @@ public class PlayerCombat : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        health = 50;
         movementController = this.GetComponent<PlayerMovement>();
-        playerAnim = this.transform.GetChild(0).GetComponent<PlayerAnimator>();
+        playerAnim = this.transform.GetComponent<PlayerAnimator>();
         StartCoroutine("Attack");
     }
 
@@ -66,6 +68,23 @@ public class PlayerCombat : MonoBehaviour
             }
             yield return null;
         }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        Debug.Log("Damage received on player, taking " + damage);
+        health = health - damage;
+        if(health < 0)
+        {
+            StartCoroutine("Waitseconds");
+            Debug.Log("damn, you died, i should shut down now.");
+            Application.Quit();
+        }
+    }
+
+    IEnumerator Waitseconds()
+    {
+        yield return new WaitForSeconds(5);
     }
 
     void Update()

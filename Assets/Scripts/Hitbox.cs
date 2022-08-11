@@ -8,7 +8,7 @@ public class Hitbox : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        SendMessage("TakeDamage", damage);
+        collision.gameObject.SendMessage("TakeDamage", damage);
         Debug.Log("Enemy attacked");
     }
 }

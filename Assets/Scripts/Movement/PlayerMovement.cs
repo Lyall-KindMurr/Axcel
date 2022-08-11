@@ -41,8 +41,8 @@ public class PlayerMovement : MonoBehaviour
         maxAirSpeedChange = maxAirAcceleration * Time.fixedDeltaTime;
 
         //not really required, but kept here.
-        anim = this.transform.GetChild(0).GetComponent<Animator>();
-        playerAnim = this.transform.GetChild(0).GetComponent<PlayerAnimator>();
+        anim = this.transform.GetComponent<Animator>();
+        playerAnim = this.transform.GetComponent<PlayerAnimator>();
     }
 
     private void LiveUpdate()

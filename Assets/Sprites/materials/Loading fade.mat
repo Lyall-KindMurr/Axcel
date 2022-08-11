@@ -53,10 +53,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - Show: 0
+    - Show: 0.31
     - Vector1_938440D7: 1.414
     - Vector1_F497C8C8: 0
     - _EnableExternalAlpha: 0
+    - _Show: 0
     m_Colors:
     - Vector2_4747B95: {r: 0.5, g: 0.5, b: 0, a: 0}
     - _Color: {r: 0.16862746, g: 0.101960786, b: 0.16199967, a: 1}

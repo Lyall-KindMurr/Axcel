@@ -23,6 +23,7 @@ public class EnemyMovement : MonoBehaviour
     public Coroutine walk;
     bool isWalking = true;
     public GameObject hitbox;
+    public int health = 10;
 
     private void Awake()
     {
@@ -116,14 +117,22 @@ public class EnemyMovement : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
         hitbox.SetActive(true);
-        yield return null;
-        yield return null;
-        yield return null;
+        yield return new WaitForSeconds(0.1f);
         hitbox.SetActive(false);
         yield return new WaitForSeconds(0.5f);
         isAttacking = false;
         isWalking = true;
         rb.bodyType = RigidbodyType2D.Dynamic;
+    }
+
+    public void TakeDamage(int amount)
+    {
+        Debug.Log("Damage received on player, taking " + amount);
+        health = health - amount;
+        if (health <= 0)
+        {
+            Destroy(this.gameObject);
+        }
     }
 
     void TurnAround()

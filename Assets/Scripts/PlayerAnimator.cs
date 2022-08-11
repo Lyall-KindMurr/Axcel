@@ -15,14 +15,14 @@ public class PlayerAnimator : MonoBehaviour
     public float XVelocity;
 
 
-    public CharacterState currentState;
+    public CharacterState currentState = new IdleState();
     private Animator anim;
     private float timeBetweenAttacks;
     //public float startAttack; // we need this to tell the difference of time between attacks?
 
     void Start()
     {
-        anim = this.GetComponentInChildren<Animator>();
+        anim = this.GetComponent<Animator>();
     }
 
     public void AttackAnim (int counter)
@@ -41,14 +41,19 @@ public class PlayerAnimator : MonoBehaviour
 
         if (currentState is IdleState)
         {
-            anim.Play("Idle");
-            //Debug.Log("IM IDLE");
-
             //if grounded and X movement, 
-            if(Grounded && Mathf.Abs(YVelocity) >=  0.1f) //nothign is setting Xvelocity
+            if(Grounded && Mathf.Abs(XVelocity) >=  0.1f)
             {
-                anim.Play("Jump");
-                Debug.Log("Jumping");
+                anim.Play("Walk");
+            }
+            else if(Mathf.Abs(YVelocity) >= 0.1f)
+            {
+                currentState = new JumpingState();
+            }
+            else
+            {
+                anim.Play("Idle");
+                //Debug.Log("IM IDLE");
             }
         }
         else if (currentState is AttackState)
@@ -57,6 +62,21 @@ public class PlayerAnimator : MonoBehaviour
             if (temp > 1.0f)
                 currentState = new IdleState();
             //Debug.Log("IM Attacking");
+        }
+        else if(currentState is JumpingState) // this acts more like an air movement handler.
+        {
+            if (YVelocity > 0.1f)
+            {
+                anim.Play("Jump");
+            }
+            else if (Grounded)
+            {
+                currentState = new IdleState();
+            }
+            else
+            {
+                anim.Play("Falling");
+            }
         }
 
         /*
